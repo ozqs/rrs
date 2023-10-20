@@ -1,7 +1,9 @@
 use rocket::Request;
 use std::fs::File;
 use std::io::prelude::*;
-use std::io::SeekFrom;
+use rrs::get_string;
+
+
 #[macro_use] extern crate rocket;
 
 #[get("/")]
@@ -9,28 +11,7 @@ fn index() -> String {
     if let Ok(indexes) = std::fs::read_to_string("indexes") {
         return indexes;
     }
-    String::from("UKE")
-}
-
-fn get_string(file: &mut File, start: usize, seek: usize) -> String {
-    match file.seek(SeekFrom::Start(((start + 8) * 4).try_into().unwrap())) {
-        Ok(_) => (),
-        Err(_) => {return String::from("UKE");},
-    };
-    let mut tmp = vec![0u8; seek * 4];
-    let _len = match file.read(&mut tmp) {
-        Ok(d) => d,
-        Err(_) => {return String::from("UKE");},
-    };
-    let mut tmp_start = 0;
-    let mut p: Vec<char> = Vec::new();
-    loop {
-        if tmp_start + 4 > tmp.len() {break; }
-        let gg: [u8; 4] = [tmp[tmp_start], tmp[tmp_start + 1], tmp[tmp_start + 2], tmp[tmp_start + 3]];
-        p.push(char::from_u32(u32::from_be_bytes(gg)).unwrap());
-        tmp_start += 4;
-    }
-    p.iter().collect::<String>()
+    String::from("404")
 }
 
 #[get("/<name>/<start>/<seek>")]
@@ -51,6 +32,7 @@ fn search_book(name: &str, start: usize, seek: usize) -> String {
     let size: usize = usize::from_be_bytes(buffer);
 
     // Later +8 is added the size header.
+    // 判断边界
     if start + 8 > size {
         String::from("404")
     } else if start + seek + 8 > size {
@@ -72,7 +54,8 @@ fn bad_gateway(_req: &Request) -> String {
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![search_book]).mount("/", routes![index])
+    rocket::build().mount("/", routes![search_book])
+    .mount("/", routes![index])
     .register("/", catchers![not_found])
     .register("/", catchers![bad_gateway])
 }

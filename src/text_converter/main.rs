@@ -1,4 +1,5 @@
 use rrs::fatal;
+mod text_converter;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -8,5 +9,5 @@ fn main() {
 
     let input = &args[1];
 
-    rrs::run_for_text_converter(&input);
+    text_converter::run(&input);
 }

@@ -1,7 +1,7 @@
+mod server;
 use rocket::Request;
-use rrs::get_rstxt_size;
-use rrs::get_string;
 use std::fs::File;
+use server::*;
 
 #[macro_use]
 extern crate rocket;

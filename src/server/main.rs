@@ -1,10 +1,10 @@
 use rocket::Request;
-use std::fs::File;
-use std::io::prelude::*;
+use rrs::get_rstxt_size;
 use rrs::get_string;
+use std::fs::File;
 
-
-#[macro_use] extern crate rocket;
+#[macro_use]
+extern crate rocket;
 
 #[get("/")]
 fn index() -> String {
@@ -24,12 +24,12 @@ fn search_book(name: &str, start: usize, seek: usize) -> String {
 
     let mut file = match File::open(name) {
         Ok(f) => f,
-        Err(_) => {return String::from("404");},
+        Err(_) => {
+            return String::from("404");
+        }
     };
 
-    let mut buffer = [0u8; 8];
-    let _n = file.read(&mut buffer[..]);
-    let size: usize = usize::from_be_bytes(buffer);
+    let size = get_rstxt_size(&mut file);
 
     // Later +8 is added the size header.
     // 判断边界
@@ -43,19 +43,20 @@ fn search_book(name: &str, start: usize, seek: usize) -> String {
 }
 
 #[catch(404)]
-fn not_found(_req: &Request) -> String { 
+fn not_found(_req: &Request) -> String {
     format!("404")
 }
 
 #[catch(502)]
-fn bad_gateway(_req: &Request) -> String { 
+fn bad_gateway(_req: &Request) -> String {
     format!("502")
 }
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![search_book])
-    .mount("/", routes![index])
-    .register("/", catchers![not_found])
-    .register("/", catchers![bad_gateway])
+    rocket::build()
+        .mount("/", routes![search_book])
+        .mount("/", routes![index])
+        .register("/", catchers![not_found])
+        .register("/", catchers![bad_gateway])
 }

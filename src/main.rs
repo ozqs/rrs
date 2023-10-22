@@ -1,7 +1,11 @@
 mod server;
+mod text_converter;
+mod usage;
+
 use rocket::Request;
-use std::fs::File;
+use std::{fs::File, process::exit};
 use server::*;
+use usage::usage;
 
 #[macro_use]
 extern crate rocket;
@@ -54,6 +58,11 @@ fn bad_gateway(_req: &Request) -> String {
 
 #[launch]
 fn rocket() -> _ {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() < 2 {
+        usage();
+        exit(1);
+    }
     rocket::build()
         .mount("/", routes![search_book])
         .mount("/", routes![index])

@@ -3,16 +3,17 @@ mod text_converter;
 mod usage;
 
 use rocket::Request;
-use std::{fs::File, process::exit};
 use server::*;
-use usage::usage;
+use std::{fs::File, process::exit};
+use text_converter::*;
+use usage::*;
 
 #[macro_use]
 extern crate rocket;
 
 #[get("/")]
 fn index() -> String {
-    if let Ok(indexes) = std::fs::read_to_string("indexes") {
+    if let Ok(indexes) = std::fs::read_to_string("target/indexes") {
         return indexes;
     }
     String::from("404")
@@ -21,10 +22,12 @@ fn index() -> String {
 #[get("/<name>/<start>/<seek>")]
 fn search_book(name: &str, start: usize, seek: usize) -> String {
     let mut name = String::from(name);
-    name.push_str(".txt.rstxt");
+    name.push_str(".rrs");
     if name.contains('/') || name.contains('\\') {
         return String::from("PSD"); // 你访问啥?! ()
     }
+
+    name = format!("target/{}", name);
 
     let mut file = match File::open(name) {
         Ok(f) => f,
@@ -63,6 +66,26 @@ fn rocket() -> _ {
         usage();
         exit(1);
     }
+
+    if args[1] == "build" {
+        exit(match build() {
+            Ok(_) => 0,
+            Err(e) => {
+                println!("{}", e.to_string());
+                1
+            }
+        });
+    } else if args[1] == "run" {
+        ()
+    } else if args[1] == "help" {
+        usage();
+        exit(0);
+    } else {
+        println!("Unknown: {}\n", args[1]);
+        usage();
+        exit(1);
+    }
+
     rocket::build()
         .mount("/", routes![search_book])
         .mount("/", routes![index])

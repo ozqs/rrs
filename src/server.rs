@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::SeekFrom;
+use std::process::exit;
 
 pub fn get_rstxt_size(file: &mut File) -> usize {
     let mut buffer = [0u8; 8];
@@ -42,4 +43,31 @@ pub fn get_string(file: &mut File, start: usize, seek: usize) -> String {
         tmp_start += 4;
     }
     p.iter().collect::<String>()
+}
+
+fn phrase(args: Vec<String>) {
+    match args[1].as_str() {
+        "build" => {
+            build();
+        },
+        _ => {
+            usage();
+            exit(1);
+        }
+    };
+}
+
+/// Show usage
+fn usage() {
+    println!("Usage: rrs [command]");
+}
+
+fn build() {
+    if let Ok(mut file) = File::open("Config.conf") {
+        let home_path = get_home_path(&mut file);
+    }
+}
+
+fn get_home_path(file: &mut File) -> String {
+    format!("Todo")
 }

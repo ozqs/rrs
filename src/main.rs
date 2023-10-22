@@ -54,6 +54,11 @@ fn bad_gateway(_req: &Request) -> String {
 
 #[launch]
 fn rocket() -> _ {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() >= 2 {
+        phrase(args);
+    }
+
     rocket::build()
         .mount("/", routes![search_book])
         .mount("/", routes![index])

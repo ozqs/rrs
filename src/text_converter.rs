@@ -16,7 +16,6 @@ fn run(input: &str, output: &str) {
     content
         .chars()
         .for_each(|e| conte.append(&mut Vec::from((e as u32).to_be_bytes())));
-        // .for_each(|e| conte.append(((e as u32).to_be_bytes())));
     f.write_all(&conte).fatal("写入文件时发生错误");
 }
 

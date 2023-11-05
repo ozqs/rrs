@@ -7,24 +7,16 @@ use walkdir::WalkDir;
 fn run(input: &str, output: &str) {
     let content = std::fs::read_to_string(input).fatal("打不开文件！");
 
-    // let output_path = format!("{}.rstxt", input);
-
     let mut f = File::create(output).fatal("打不开将写入的文件！");
 
     f.write_all(&(content.len()).to_be_bytes())
         .fatal("写入文件时发生错误");
 
-    // let content: Vec<char> = content.chars().collect();
-
-    // for ch in content {
-    //     let uch = ch as u32;
-    //     f.write_all(&uch.to_be_bytes()).fatal("写入文件时发生错误");
-    // }
-
     let mut conte = Vec::<u8>::new();
     content
         .chars()
         .for_each(|e| conte.append(&mut Vec::from((e as u32).to_be_bytes())));
+        // .for_each(|e| conte.append(((e as u32).to_be_bytes())));
     f.write_all(&conte).fatal("写入文件时发生错误");
 }
 

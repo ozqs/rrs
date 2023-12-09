@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::SeekFrom;
+// pub mod crate::text_converter;
 
 pub fn get_rstxt_size(file: &mut File) -> usize {
     let mut buffer = [0u8; 8];

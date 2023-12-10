@@ -3,5 +3,5 @@ pub fn usage() {
     println!("rrs [command]");
     println!("  command:");
     println!("    run: run the server.");
-    println!("    build: foreach the src and build to generate in target.");
+    println!("    build: traverse the src and build to generate in target.");
 }

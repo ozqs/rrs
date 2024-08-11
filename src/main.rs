@@ -21,10 +21,17 @@ fn index() -> String {
 
 #[get("/<name>/<start>/<seek>")]
 fn search_book(name: &str, start: usize, seek: usize) -> String {
+    match book_search(name, start, seek) {
+        Ok(value) => value,
+        Err(value) => return value,
+    }
+}
+
+fn book_search(name: &str, start: usize, seek: usize) -> Result<String, String> {
     let mut name = String::from(name);
     name.push_str(".rrs");
     if name.contains('/') || name.contains('\\') {
-        return String::from("PSD"); // 你访问啥?! ()
+        return Err(String::from("PSD")); // 你访问啥?! ()
     }
 
     name = format!("target/{}", name);
@@ -32,7 +39,7 @@ fn search_book(name: &str, start: usize, seek: usize) -> String {
     let mut file = match File::open(name) {
         Ok(f) => f,
         Err(_) => {
-            return String::from("404");
+            return Err(String::from("404"));
         }
     };
 
@@ -40,13 +47,13 @@ fn search_book(name: &str, start: usize, seek: usize) -> String {
 
     // Later +8 is added the size header.
     // 判断边界
-    if start + 8 > size {
+    Ok(if start + 8 > size {
         String::from("404")
     } else if start + seek + 8 > size {
         get_string(&mut file, start, size - start)
     } else {
         get_string(&mut file, start, seek)
-    }
+    })
 }
 
 #[catch(404)]
